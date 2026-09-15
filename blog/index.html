@@ -1,0 +1,116 @@
+---
+layout: null
+permalink: /blog/
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Security articles, notes, and lab walkthroughs by Mitul Kumar.">
+  <meta name="theme-color" content="#0c100e">
+  <meta property="og:title" content="Blog | Mitul Kumar">
+  <meta property="og:description" content="Security articles, notes, and lab walkthroughs by Mitul Kumar.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ page.url | absolute_url }}">
+  <title>Blog</title>
+  <link rel="canonical" href="{{ page.url | absolute_url }}">
+  <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' | relative_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;450;500;600;650;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/styles.css' | relative_url }}">
+  <script src="{{ '/script.js' | relative_url }}" defer></script>
+</head>
+<body class="blog">
+  <a class="skip-link" href="#content">Skip to posts</a>
+
+  <div class="terminal-bar">
+    <div class="terminal-bar-inner">
+      <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <a class="terminal-title" href="{{ '/' | relative_url }}" aria-label="Mitul Kumar portfolio">mitul<span class="muted">@</span>portfolio<span class="terminal-path">: ~</span></a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="{{ '/' | relative_url }}">Portfolio</a>
+        <a href="{{ '/blog/' | relative_url }}" aria-current="page">Blog</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="layout" id="top">
+    <header class="profile">
+      <div class="profile-main">
+        <p class="shell-prompt" aria-hidden="true"><span>~</span> $ ls blog/</p>
+        <h1>Blog<span class="cursor" aria-hidden="true">_</span></h1>
+        <p class="profile-role">Mitul Kumar</p>
+        <p class="profile-intro">Security articles, notes, and lab walkthroughs.<br>What I learn through research and practical testing.</p>
+
+        <div class="blog-filters" role="group" aria-label="Filter posts by platform" hidden>
+          <button type="button" data-filter="all" aria-pressed="true">All posts</button>
+          <button type="button" data-filter="tryhackme" aria-pressed="false">TryHackMe</button>
+          <button type="button" data-filter="hackthebox" aria-pressed="false">Hack The Box</button>
+        </div>
+
+        <a class="blog-return" href="{{ '/' | relative_url }}"><span aria-hidden="true">←</span> Back to portfolio</a>
+      </div>
+
+      <div class="profile-bottom">
+        <a class="profile-contact" href="https://github.com/bl4ck574r" target="_blank" rel="noopener noreferrer">Find me on GitHub <span class="arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </header>
+
+    <main id="content">
+      <section class="content-section" aria-labelledby="posts-heading">
+        <div class="archive-heading">
+          <h2 class="section-heading" id="posts-heading"><span class="heading-prompt" aria-hidden="true">~/</span>All posts</h2>
+          <span class="post-count" role="status" aria-live="polite">{{ site.posts.size }} {% if site.posts.size == 1 %}post{% else %}posts{% endif %}</span>
+        </div>
+
+        <div class="post-list">
+          {% for post in site.posts %}
+            {% assign post_topics = post.tags | concat: post.categories | join: ',' | downcase | remove: ' ' %}
+            {% assign platform = 'other' %}
+            {% assign platform_label = '' %}
+            {% if post_topics contains 'tryhackme' %}
+              {% assign platform = 'tryhackme' %}
+              {% assign platform_label = 'TryHackMe' %}
+            {% elsif post_topics contains 'hackthebox' %}
+              {% assign platform = 'hackthebox' %}
+              {% assign platform_label = 'Hack The Box' %}
+            {% endif %}
+
+            <article class="blog-post" data-platform="{{ platform }}">
+              <div class="post-meta">
+                <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%-d %b %Y' }}</time>
+                {% if platform_label != '' %}
+                  <span class="post-platform">{{ platform_label }}</span>
+                {% elsif post.categories.size > 0 %}
+                  <span class="post-platform">{{ post.categories | join: ' · ' | escape }}</span>
+                {% endif %}
+                {% if post_topics contains 'windows' %}
+                  <span>Windows</span>
+                {% elsif post_topics contains 'linux' %}
+                  <span>Linux</span>
+                {% endif %}
+              </div>
+
+              <h3>
+                <a href="{{ post.url | relative_url }}">{{ post.title | escape }}<span class="arrow" aria-hidden="true">→</span></a>
+              </h3>
+              {% if post.description and post.description != '' %}
+                <p>{{ post.description | strip_html | escape }}</p>
+              {% endif %}
+            </article>
+          {% else %}
+            <p class="archive-intro">No posts published yet.</p>
+          {% endfor %}
+        </div>
+      </section>
+
+      <footer>
+        <p>© <span id="year">{{ site.time | date: '%Y' }}</span> Mitul Kumar.</p>
+        <a class="back-to-top" href="#top">Back to top <span aria-hidden="true">↑</span></a>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

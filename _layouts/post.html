@@ -1,0 +1,88 @@
+---
+layout: null
+---
+{% assign article_description = page.description | default: page.excerpt | strip_html | normalize_whitespace | truncate: 160 %}
+<!doctype html>
+<html lang="{{ page.lang | default: site.lang | default: 'en' | escape }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.title | escape }} | Mitul Kumar</title>
+  <meta name="description" content="{{ article_description | escape }}">
+  <meta name="author" content="Mitul Kumar">
+  <meta name="theme-color" content="#0c100e">
+  <meta property="og:title" content="{{ page.title | escape }} | Mitul Kumar">
+  <meta property="og:description" content="{{ article_description | escape }}">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="{{ page.url | absolute_url }}">
+  <meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}">
+  <link rel="canonical" href="{{ page.url | absolute_url }}">
+  <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' | relative_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;450;500;600;650;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/styles.css' | relative_url }}">
+</head>
+<body class="article-page" id="top">
+  <a class="skip-link" href="#content">Skip to article</a>
+  <div class="terminal-bar">
+    <div class="terminal-bar-inner">
+      <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <a class="terminal-title" href="{{ '/' | relative_url }}" aria-label="Mitul Kumar portfolio">mitul<span class="muted">@</span>portfolio<span class="terminal-path">: ~</span></a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="{{ '/' | relative_url }}">Portfolio</a>
+        <a href="{{ '/blog/' | relative_url }}" aria-current="true">Blog</a>
+      </nav>
+    </div>
+  </div>
+
+  <main class="article-shell" id="content">
+    <a class="article-back" href="{{ '/blog/' | relative_url }}"><span aria-hidden="true">←</span> All posts</a>
+    <article aria-labelledby="article-title">
+      <header class="article-header">
+        <p class="shell-prompt" aria-hidden="true"><span>~/blog</span> $ cat {{ page.slug | escape }}.md</p>
+        <h1 id="article-title">{{ page.title | escape }}</h1>
+        <div class="article-meta">
+          <span>Mitul Kumar</span>
+          <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%-d %B %Y' }}</time>
+        </div>
+        {% if page.tags.size > 0 %}
+        <ul class="tags" aria-label="Topics">
+          {% for tag in page.tags %}<li>{{ tag | escape }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+        {% if page.description and page.description != '' %}
+        <p class="article-description">{{ page.description | escape }}</p>
+        {% endif %}
+      </header>
+
+      <div class="post-content">
+        {{ content }}
+      </div>
+    </article>
+
+    {% if page.previous or page.next %}
+    <nav class="article-pagination" aria-label="More articles">
+      {% if page.previous %}
+      <a href="{{ page.previous.url | relative_url }}" rel="prev">
+        <span>← Older post</span>
+        <strong>{{ page.previous.title | escape }}</strong>
+      </a>
+      {% endif %}
+      {% if page.next %}
+      <a href="{{ page.next.url | relative_url }}" rel="next">
+        <span>Newer post →</span>
+        <strong>{{ page.next.title | escape }}</strong>
+      </a>
+      {% endif %}
+    </nav>
+    {% endif %}
+
+    <footer class="article-footer">
+      <a href="{{ '/blog/' | relative_url }}">← All posts</a>
+      <span>© {{ site.time | date: '%Y' }} Mitul Kumar</span>
+      <a class="back-to-top" href="#top">Back to top ↑</a>
+    </footer>
+  </main>
+</body>
+</html>
